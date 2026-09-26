@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>मोमोज़ हिसाब-किताब</title>
+<style>
+  :root {
+    --paper: #FAF6EC;
+    --paper-line: #DDD3B8;
+    --ink: #262019;
+    --ink-soft: #6B5F4C;
+    --green: #2E5B41;
+    --green-soft: #E4EEE3;
+    --turmeric: #D99A2B;
+    --clay: #A8503A;
+    --clay-soft: #F4E4DC;
+    --card: #FFFFFF;
+    --shadow: rgba(38, 32, 25, 0.08);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #1B1712;
+      --paper-line: #3A3226;
+      --ink: #EFE7D8;
+      --ink-soft: #B3A78F;
+      --green: #6FAE86;
+      --green-soft: #223228;
+      --turmeric: #E3B458;
+      --clay: #D98468;
+      --clay-soft: #35251F;
+      --card: #241F18;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1B1712;
+    --paper-line: #3A3226;
+    --ink: #EFE7D8;
+    --ink-soft: #B3A78F;
+    --green: #6FAE86;
+    --green-soft: #223228;
+    --turmeric: #E3B458;
+    --clay: #D98468;
+    --clay-soft: #35251F;
+    --card: #241F18;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+    padding: 20px 14px 60px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+
+  header {
+    margin-bottom: 22px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px;
+  }
+  header .kicker {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  h1 {
+    font-family: Georgia, "Noto Serif Devanagari", serif;
+    font-size: 26px;
+    margin: 4px 0 6px;
+    font-weight: 700;
+  }
+  header p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--paper-line);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+  .card h2 {
+    font-family: Georgia, "Noto Serif Devanagari", serif;
+    font-size: 18px;
+    margin: 0 0 4px;
+  }
+  .card .hint { color: var(--ink-soft); font-size: 13px; margin: 0 0 14px; }
+
+  .batch-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .batch-row label { font-size: 14px; font-weight: 600; min-width: 110px; }
+  .batch-row input[type="number"], .batch-row input[type="date"] {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    width: 140px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--paper-line);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .split { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  button.primary {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: var(--green);
+    color: #fff;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  button.primary:hover { filter: brightness(1.05); }
+  button.secondary {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--paper-line);
+    background: var(--green-soft);
+    color: var(--green);
+    cursor: pointer;
+  }
+  button.secondary.active { background: var(--green); color: #fff; }
+  button.danger-link {
+    background: none; border: none; color: var(--clay);
+    font-size: 12px; text-decoration: underline; cursor: pointer; padding: 2px 6px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 1.5px solid var(--ink);
+    padding: 6px 6px;
+  }
+  tbody td { padding: 8px 6px; border-bottom: 1px solid var(--paper-line); }
+  tbody tr:last-child td { border-bottom: none; }
+  .item-name { font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rate-input {
+    width: 78px;
+    padding: 5px 6px;
+    border: 1.5px solid var(--paper-line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+  }
+  .rate-input:focus { outline: 2px solid var(--turmeric); outline-offset: 1px; }
+
+  .total-row td {
+    border-top: 2px solid var(--ink);
+    border-bottom: none;
+    padding-top: 14px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .total-row .num { color: var(--clay); }
+
+  .table-scroll { overflow-x: auto; }
+
+  .foot-note { font-size: 12.5px; color: var(--ink-soft); margin-top: 10px; }
+  .save-status { font-size: 12px; color: var(--green); margin-top: 10px; min-height: 16px; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat {
+    background: var(--green-soft);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .stat .label { font-size: 12px; color: var(--ink-soft); }
+  .stat .value { font-size: 19px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+  .stat.cost .value { color: var(--clay); }
+
+  a { color: var(--green); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">मोमोज़ ठेला हिसाब-किताब</div>
+    <h1>रोज़ का हिसाब और रिपोर्ट</h1>
+    <p>रोज़ कितने मोमोज़ बने, कितना खर्चा हुआ — और हफ़्ते, महीने, साल की रिपोर्ट यहीं देखें।</p>
+  </header>
+
+  <div class="card">
+    <h2>आज की एंट्री</h2>
+    <p class="hint">पनीर सिर्फ़ पनीर मोमोज़ में लगता है। बाकी सारा माल दोनों में शेयर होता है, इसलिए वो कुल (पनीर+वेज) संख्या से निकलता है।</p>
+    <div class="batch-row">
+      <label for="entryDate">तारीख</label>
+      <input type="date" id="entryDate">
+    </div>
+    <div class="batch-row">
+      <label for="paneerCount">पनीर मोमोज़</label>
+      <input type="number" id="paneerCount" value="615" min="0" step="1">
+    </div>
+    <div class="batch-row">
+      <label for="vegCount">वेज मोमोज़</label>
+      <input type="number" id="vegCount" value="585" min="0" step="1">
+      <span class="split" id="splitInfo"></span>
+    </div>
+    <button class="primary" id="saveEntryBtn">आज की एंट्री सेव करें</button>
+    <p class="save-status" id="saveStatus"></p>
+  </div>
+
+  <div class="card">
+    <h2>माल और रेट</h2>
+    <p class="hint">ऊपर डाली गई संख्या के हिसाब से नीचे मात्रा और कीमत दिखेगी।</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>आइटम</th>
+            <th class="num">मात्रा</th>
+            <th class="num">रेट ₹/किलो</th>
+            <th class="num">कीमत ₹</th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody"></tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="3">कुल खर्च</td>
+            <td class="num" id="grandTotal">₹0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="foot-note" id="syncNote"></p>
+    <p class="foot-note">रेट Google Sheet में बदलो, फिर मुझसे (Claude) बोलो "sheet se sync kar do" — <a id="sheetLink" href="#" target="_blank" rel="noopener">Sheet यहाँ खोलें</a>। ऊपर सीधे टाइप किया गया रेट सिर्फ़ अभी की गणना के लिए है।</p>
+    <p class="foot-note">LPG का रेट सिलेंडर के हिसाब से अलग होता है — चाहें तो उसका ₹/किलो निकालकर डाल दें, या 0 छोड़ दें।</p>
+  </div>
+
+  <div class="card">
+    <h2>रिपोर्ट</h2>
+    <div class="tabs">
+      <button class="secondary" data-period="week">इस हफ़्ते</button>
+      <button class="secondary" data-period="month">इस महीने</button>
+      <button class="secondary" data-period="year">इस साल</button>
+      <button class="secondary" data-period="all">सारा डेटा</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="label">कुल पनीर मोमोज़</div>
+        <div class="value" id="statPaneer">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">कुल वेज मोमोज़</div>
+        <div class="value" id="statVeg">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">कुल मोमोज़</div>
+        <div class="value" id="statTotal">—</div>
+      </div>
+      <div class="stat cost">
+        <div class="label">कुल खर्च</div>
+        <div class="value" id="statCost">—</div>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>तारीख</th>
+            <th class="num">पनीर</th>
+            <th class="num">वेज</th>
+            <th class="num">कुल</th>
+            <th class="num">खर्च ₹</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="reportBody">
+          <tr><td colspan="6" style="color:var(--ink-soft);">लोड हो रहा है…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="secondary" id="exportBtn" style="margin-top:14px;">CSV डाउनलोड करें</button>
+    <p class="save-status" id="reportStatus"></p>
+  </div>
+</div>
+
+<script>
+  // ===== base recipe (per 1200 momos: 615 paneer + 585 veg) =====
+  const BASE_MOMOS = 1200;
+  const BASE_PANEER = 615;
+  const ITEMS = [
+    { key: "maida", name: "मैदा", grams: 11000 },
+    { key: "ajinomoto", name: "अजीनोमोटो", grams: 1000 },
+    { key: "gobhi", name: "पत्ता गोभी", grams: 15000 },
+    { key: "gajar", name: "गाजर", grams: 1500 },
+    { key: "piyaj", name: "प्याज", grams: 15000 },
+    { key: "dhaniya", name: "धनिया", grams: 750 },
+    { key: "harimirch", name: "हरी मिर्च", grams: 3000 },
+    { key: "adrak", name: "अदरक", grams: 3000 },
+    { key: "tamatar", name: "टमाटर", grams: 3000 },
+    { key: "lalmirch", name: "लाल मिर्च पाउडर", grams: 1000 },
+    { key: "nutrala", name: "सोयाबीन नुट्रेला", grams: 200 },
+    { key: "ararot", name: "अरारोट पाउडर", grams: 1000 },
+    { key: "namak", name: "नमक", grams: 2000 },
+    { key: "oilraggold", name: "तेल (राग गोल्ड)", grams: 4000 },
+    { key: "musteroil", name: "सरसों तेल", grams: 1000 },
+    { key: "mayo", name: "मेयोनीज़", grams: 3000 },
+    { key: "oregano", name: "ओरिगेनो", grams: 500 },
+    { key: "butter", name: "बटर", grams: 500 },
+    { key: "paneer", name: "पनीर", grams: 4500 },
+    { key: "lahsun", name: "लहसुन", grams: 4000 },
+    { key: "dalda", name: "डालडा", grams: 1000 },
+    { key: "lpg", name: "एलपीजी गैस", grams: 14000 },
+  ];
+  const PANEER_PER_MOMO_G = 4500 / BASE_PANEER;
+
+  // ===== rates, last pulled from the "Momos Material Rates" Google Sheet =====
+  // update this block whenever you ask Claude to "sheet se sync karo"
+  const SHEET_SYNCED_AT = "18 Sep 2026";
+  const SHEET_RATES = {
+    maida: 0, ajinomoto: 0, gobhi: 0, gajar: 0, piyaj: 0, dhaniya: 0,
+    harimirch: 0, adrak: 0, tamatar: 0, lalmirch: 0, nutrala: 0,
+    ararot: 0, namak: 0, oilraggold: 0, musteroil: 0, mayo: 0,
+    oregano: 0, butter: 0, paneer: 0, lahsun: 0, dalda: 0, lpg: 0
+  };
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/1OvbpO6NWNPoiQHUI-rBTuiN8OtouRO-kuBCvGjCw8Wc/edit";
+
+  const STORAGE_KEY = "momos_material_rates_v1";
+  function loadLocalRates() {
+    try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : {}; }
+    catch (e) { return {}; }
+  }
+  function saveLocalRates(r) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); } catch (e) {}
+  }
+  let rates = Object.assign({}, SHEET_RATES, loadLocalRates());
+
+  function formatQty(grams) {
+    if (grams >= 1000) {
+      const kg = grams / 1000;
+      return (kg % 1 === 0 ? kg.toFixed(0) : kg.toFixed(2)) + " किग्रा";
+    }
+    return Math.round(grams) + " ग्राम";
+  }
+  function formatMoney(v) {
+    return "₹" + Math.round(v).toLocaleString("en-IN");
+  }
+  function todayStr() {
+    const d = new Date();
+    const tz = d.getTimezoneOffset() * 60000;
+    return new Date(d - tz).toISOString().slice(0, 10);
+  }
+
+  function computeForCounts(paneerCount, vegCount) {
+    const totalCount = paneerCount + vegCount;
+    const totalFactor = totalCount / BASE_MOMOS;
+    let grandTotal = 0;
+    const perItem = {};
+    ITEMS.forEach(item => {
+      const grams = item.key === "paneer"
+        ? PANEER_PER_MOMO_G * paneerCount
+        : item.grams * totalFactor;
+      const rate = rates[item.key] ? parseFloat(rates[item.key]) : 0;
+      const cost = (grams / 1000) * rate;
+      perItem[item.key] = { grams, cost };
+      grandTotal += cost;
+    });
+    return { perItem, totalCost: grandTotal, totalCount };
+  }
+
+  // ===== rates table UI =====
+  function buildRows() {
+    const tbody = document.getElementById("itemsBody");
+    tbody.innerHTML = "";
+    ITEMS.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="item-name">${item.name}</td>
+        <td class="num" data-qty="${item.key}">—</td>
+        <td class="num">
+          <input type="number" class="rate-input" data-rate="${item.key}"
+                 min="0" step="0.01" value="${rates[item.key] || ""}" placeholder="0">
+        </td>
+        <td class="num" data-cost="${item.key}">₹0</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll("[data-rate]").forEach(input => {
+      input.addEventListener("input", () => {
+        const key = input.getAttribute("data-rate");
+        rates[key] = input.value === "" ? 0 : parseFloat(input.value);
+        saveLocalRates(rates);
+        recalcDisplay();
+      });
+    });
+  }
+
+  function currentCounts() {
+    let paneerCount = parseInt(document.getElementById("paneerCount").value, 10);
+    let vegCount = parseInt(document.getElementById("vegCount").value, 10);
+    if (!paneerCount || paneerCount < 0) paneerCount = 0;
+    if (!vegCount || vegCount < 0) vegCount = 0;
+    return { paneerCount, vegCount };
+  }
+
+  function recalcDisplay() {
+    const { paneerCount, vegCount } = currentCounts();
+    const { perItem, totalCost, totalCount } = computeForCounts(paneerCount, vegCount);
+    document.getElementById("splitInfo").textContent = totalCount > 0 ? `कुल ${totalCount} मोमोज़` : "";
+    ITEMS.forEach(item => {
+      document.querySelector(`[data-qty="${item.key}"]`).textContent = formatQty(perItem[item.key].grams);
+      document.querySelector(`[data-cost="${item.key}"]`).textContent = formatMoney(perItem[item.key].cost);
+    });
+    document.getElementById("grandTotal").textContent = formatMoney(totalCost);
+  }
+
+  document.getElementById("paneerCount").addEventListener("input", recalcDisplay);
+  document.getElementById("vegCount").addEventListener("input", recalcDisplay);
+  document.getElementById("sheetLink").href = SHEET_URL;
+  document.getElementById("syncNote").textContent = "रेट Google Sheet से आखिरी बार " + SHEET_SYNCED_AT + " को लिए गए थे।";
+  document.getElementById("entryDate").value = todayStr();
+
+  buildRows();
+  recalcDisplay();
+
+  // ===== db-backed daily log =====
+  let db = null;
+  let entriesCol = null;
+
+  async function initDb() {
+    try { db = await claude.use("db"); } catch (e) { db = null; }
+    if (!db) {
+      document.getElementById("saveStatus").textContent = "क्लाउड लॉग उपलब्ध नहीं — एंट्री सेव नहीं हो पाएगी।";
+      document.getElementById("reportBody").innerHTML =
+        '<tr><td colspan="6" style="color:var(--ink-soft);">रिपोर्ट के लिए क्लाउड लॉग उपलब्ध नहीं है।</td></tr>';
+      return;
+    }
+    entriesCol = db.collection("entries");
+    loadReport("week");
+  }
+
+  document.getElementById("saveEntryBtn").addEventListener("click", async () => {
+    const date = document.getElementById("entryDate").value || todayStr();
+    const { paneerCount, vegCount } = currentCounts();
+    const { totalCost, totalCount } = computeForCounts(paneerCount, vegCount);
+    const statusEl = document.getElementById("saveStatus");
+    if (!entriesCol) {
+      statusEl.textContent = "क्लाउड लॉग उपलब्ध नहीं, एंट्री सेव नहीं हुई।";
+      return;
+    }
+    statusEl.textContent = "सेव हो रहा है…";
+    try {
+      await entriesCol.doc(date).set({
+        date, paneerCount, vegCount, totalCount,
+        totalCost, ratesUsed: Object.assign({}, rates),
+        updatedAt: new Date().toISOString()
+      });
+      statusEl.textContent = `✓ ${date} की एंट्री सेव हो गई (${formatMoney(totalCost)})`;
+      loadReport(currentPeriod);
+    } catch (e) {
+      statusEl.textContent = "सेव नहीं हो पाया, दोबारा कोशिश करें।";
+    }
+  });
+
+  // ===== reports =====
+  let currentPeriod = "week";
+  function periodRange(period) {
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+    let start;
+    if (period === "week") {
+      const day = now.getDay(); // 0 Sun..6 Sat
+      const diffToMonday = (day === 0 ? 6 : day - 1);
+      start = new Date(y, m, d - diffToMonday);
+    } else if (period === "month") {
+      start = new Date(y, m, 1);
+    } else if (period === "year") {
+      start = new Date(y, 0, 1);
+    } else {
+      return { start: "0000-01-01", end: "9999-12-31" };
+    }
+    const fmt = (dt) => {
+      const tz = dt.getTimezoneOffset() * 60000;
+      return new Date(dt - tz).toISOString().slice(0, 10);
+    };
+    return { start: fmt(start), end: todayStr() };
+  }
+
+  async function loadReport(period) {
+    currentPeriod = period;
+    document.querySelectorAll(".tabs button").forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-period") === period);
+    });
+    const reportBody = document.getElementById("reportBody");
+    if (!entriesCol) return;
+    reportBody.innerHTML = '<tr><td colspan="6" style="color:var(--ink-soft);">लोड हो रहा है…</td></tr>';
+    const { start, end } = periodRange(period);
+    try {
+      const snap = await entriesCol.where("date", ">=", start).where("date", "<=", end).orderBy("date", "desc").get();
+      let totalPaneer = 0, totalVeg = 0, totalCost = 0;
+      reportBody.innerHTML = "";
+      if (snap.empty) {
+        reportBody.innerHTML = '<tr><td colspan="6" style="color:var(--ink-soft);">इस दौरान कोई एंट्री नहीं है।</td></tr>';
+      }
+      snap.docs.forEach(doc => {
+        const e = doc.data();
+        totalPaneer += e.paneerCount || 0;
+        totalVeg += e.vegCount || 0;
+        totalCost += e.totalCost || 0;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${e.date}</td>
+          <td class="num">${e.paneerCount || 0}</td>
+          <td class="num">${e.vegCount || 0}</td>
+          <td class="num">${e.totalCount || (e.paneerCount||0)+(e.vegCount||0)}</td>
+          <td class="num">${formatMoney(e.totalCost || 0)}</td>
+          <td class="num"><button class="danger-link" data-del="${e.date}">हटाएं</button></td>
+        `;
+        reportBody.appendChild(tr);
+      });
+      document.getElementById("statPaneer").textContent = totalPaneer.toLocaleString("en-IN");
+      document.getElementById("statVeg").textContent = totalVeg.toLocaleString("en-IN");
+      document.getElementById("statTotal").textContent = (totalPaneer + totalVeg).toLocaleString("en-IN");
+      document.getElementById("statCost").textContent = formatMoney(totalCost);
+
+      reportBody.querySelectorAll("[data-del]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!confirm(`${btn.getAttribute("data-del")} की एंट्री हटाएं?`)) return;
+          await entriesCol.doc(btn.getAttribute("data-del")).delete();
+          loadReport(currentPeriod);
+        });
+      });
+    } catch (e) {
+      reportBody.innerHTML = '<tr><td colspan="6" style="color:var(--clay);">रिपोर्ट लोड नहीं हो पाई।</td></tr>';
+    }
+  }
+
+  document.querySelectorAll(".tabs button").forEach(btn => {
+    btn.addEventListener("click", () => loadReport(btn.getAttribute("data-period")));
+  });
+
+  // ===== CSV export =====
+  document.getElementById("exportBtn").addEventListener("click", async () => {
+    const statusEl = document.getElementById("reportStatus");
+    if (!entriesCol) { statusEl.textContent = "क्लाउड लॉग उपलब्ध नहीं।"; return; }
+    let downloads = null;
+    try { downloads = await claude.use("downloads"); } catch (e) { downloads = null; }
+    if (!downloads) { statusEl.textContent = "डाउनलोड सुविधा उपलब्ध नहीं है।"; return; }
+    statusEl.textContent = "तैयार हो रहा है…";
+    try {
+      const snap = await entriesCol.orderBy("date", "asc").get();
+      let csv = "date,paneer_momos,veg_momos,total_momos,total_cost\n";
+      snap.docs.forEach(doc => {
+        const e = doc.data();
+        csv += `${e.date},${e.paneerCount || 0},${e.vegCount || 0},${e.totalCount || 0},${(e.totalCost || 0).toFixed(2)}\n`;
+      });
+      await downloads.save({ filename: "momos-daily-log.csv", data: csv });
+      statusEl.textContent = "";
+    } catch (e) {
+      statusEl.textContent = "डाउनलोड नहीं हो पाया।";
+    }
+  });
+
+  initDb();
+</script>
+</body>
+</html>
