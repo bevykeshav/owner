@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crave Kitchen – संपर्क</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F4F0;--card:#fff;--ink:#14231C;--mute:#5F6F66;--line:#DDE3DC;--red:#C8102E;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101814;--card:#18231D;--ink:#EAF1EC;--mute:#93A399;--line:#26352C;--red:#F0475F}}
+:root[data-theme="dark"]{--bg:#101814;--card:#18231D;--ink:#EAF1EC;--mute:#93A399;--line:#26352C;--red:#F0475F}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind',system-ui,sans-serif;font-size:16px;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+header{padding:18px 16px 8px}
+h1{margin:0;font-size:22px;font-weight:700}
+.sub{color:var(--mute);font-size:14px}
+.search{margin:10px 16px;display:block;width:calc(100% - 32px);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 10px;scrollbar-width:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;border-radius:20px;font:inherit;font-size:14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{margin:0 16px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;font:inherit;text-align:left}
+.row:last-child{border-bottom:0}
+.av{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff}
+.nm{font-weight:500}.ph{color:var(--mute);font-size:14px}
+.tag{margin-left:auto;font-size:12px;color:var(--mute);border:1px solid var(--line);padding:2px 8px;border-radius:10px}
+.empty{padding:36px 20px;text-align:center;color:var(--mute)}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--red);color:#fff;border:0;border-radius:28px;padding:14px 22px;font:inherit;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.bk{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:5}
+.bk.open{display:flex}
+.sheet{background:var(--card);width:100%;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90%;overflow:auto;animation:up .18s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.big{font-size:20px;font-weight:700;margin:0}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 10px}
+.a{display:block;text-align:center;text-decoration:none;padding:14px;border-radius:12px;font-weight:700;color:#fff;border:0;font:inherit;font-weight:700}
+.call{background:#1B6EF3}.wa{background:#1FA855}
+.sm{display:flex;gap:10px}
+.sm button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit}
+.sm .del{color:var(--red)}
+label{display:block;margin:12px 0 4px;font-size:14px;color:var(--mute)}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.save{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;background:var(--red);color:#fff;font:inherit;font-weight:700}
+.foot{display:flex;gap:10px;justify-content:center;margin:18px 16px 0}
+.foot button{background:none;border:1px solid var(--line);color:var(--mute);padding:8px 14px;border-radius:10px;font:inherit;font-size:14px}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><h1>Crave Kitchen संपर्क</h1><div class="sub" id="cnt"></div></header>
+<input class="search" id="q" type="search" placeholder="नाम या नंबर खोजें">
+<div class="chips" id="chips"></div>
+<div class="list" id="list"></div>
+<div class="foot"><button id="rf">🔄 शीट से रीफ़्रेश</button><button id="st">⚙️ शीट लिंक</button></div>
+<button class="fab" id="add">+ नया नंबर</button>
+
+<div class="bk" id="bk"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const CATS=[["ग्राहक","#C8102E"],["वर्कर","#1B6EF3"],["हेल्पर","#8A5A00"],["डीलर","#6B3FA0"],["सप्लायर","#0E7C66"]];
+const KEY="crave_contacts_v1",URLK="crave_contacts_api";
+let data=[],filter="सभी",api="",status="";
+try{data=JSON.parse(localStorage.getItem(KEY)||"[]");api=localStorage.getItem(URLK)||""}catch(e){}
+const $=id=>document.getElementById(id);
+const cache=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+const color=c=>(CATS.find(x=>x[0]===c)||[0,"#555"])[1];
+const digits=n=>n.replace(/\D/g,"");
+const wa=n=>{let d=digits(n);if(d.length===10)d="91"+d;else if(d.length===11&&d[0]==="0")d="91"+d.slice(1);return "https://wa.me/"+d};
+const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function jsonp(params){return new Promise((res,rej)=>{
+  const cb="cb"+Date.now()+Math.floor(Math.random()*1e4),s=document.createElement("script");
+  const clean=()=>{clearTimeout(t);delete window[cb];s.remove()};
+  const t=setTimeout(()=>{clean();rej()},20000);
+  window[cb]=r=>{clean();res(r)};s.onerror=()=>{clean();rej()};
+  s.src=api+"?"+new URLSearchParams({...params,callback:cb});document.head.appendChild(s)})}
+function setStatus(t){status=t;$("cnt").textContent=data.length+" संपर्क"+(t?" • "+t:"")}
+function push(p){
+  if(!api)return;setStatus("शीट में सेव हो रहा है…");
+  jsonp(p).then(r=>setStatus(r&&r.ok?"शीट में सेव हो गया":"शीट में सेव नहीं हुआ")).catch(()=>setStatus("इंटरनेट/शीट लिंक की दिक्कत, दोबारा कोशिश करें"));
+}
+function load(){
+  if(!api){setup();return}
+  setStatus("शीट से ला रहे हैं…");
+  jsonp({action:"list"}).then(r=>{if(r&&r.ok){data=r.rows;cache();render();setStatus("शीट से अपडेट")}else setStatus("शीट पढ़ नहीं पाए")})
+   .catch(()=>setStatus("शीट से नहीं जुड़ पाए (पुराने नंबर दिख रहे हैं)"));
+}
+function render(){
+  const q=$("q").value.trim().toLowerCase();
+  $("chips").innerHTML=["सभी",...CATS.map(c=>c[0])].map(c=>{
+    const n=c==="सभी"?data.length:data.filter(d=>d.cat===c).length;
+    return `<button class="chip ${c===filter?"on":""}" data-c="${c}">${c} (${n})</button>`}).join("");
+  const rows=data.filter(d=>(filter==="सभी"||d.cat===filter)&&(!q||d.name.toLowerCase().includes(q)||d.phone.includes(q)))
+    .sort((a,b)=>a.name.localeCompare(b.name,"hi"));
+  setStatus(status);
+  $("list").innerHTML=rows.length?rows.map(d=>`<button class="row" data-id="${d.id}"><span class="av" style="background:${color(d.cat)}">${esc(d.name.trim()[0]||"?")}</span><span><div class="nm">${esc(d.name)}</div><div class="ph">${esc(d.phone)}</div></span><span class="tag">${d.cat}</span></button>`).join("")
+    :`<div class="empty">${data.length?"कोई संपर्क नहीं मिला":"अभी कोई नंबर नहीं है। नीचे \"+ नया नंबर\" दबाकर पहला संपर्क जोड़ें।"}</div>`;
+}
+const open=h=>{$("sheet").innerHTML=h;$("bk").classList.add("open")};
+const close=()=>$("bk").classList.remove("open");
+function setup(){
+  open(`<p class="big">Google Sheet जोड़ें</p><div class="ph" style="margin-top:6px">Apps Script की Web app वाली लिंक (https://script.google.com/macros/s/.../exec) यहाँ चिपकाएँ।</div>
+  <label>Web app लिंक</label><input id="fu" type="url" value="${esc(api)}" placeholder="https://script.google.com/macros/s/.../exec">
+  <button class="save" id="su">लिंक सेव करें</button>`);
+}
+function view(id){
+  const d=data.find(x=>x.id===id);if(!d)return;
+  open(`<p class="big">${esc(d.name)}</p><div class="ph">${esc(d.phone)} • ${d.cat}</div>${d.note?`<div class="ph" style="margin-top:6px">${esc(d.note)}</div>`:""}
+  <div class="acts"><a class="a call" href="tel:${digits(d.phone)}">📞 कॉल करें</a><a class="a wa" href="${wa(d.phone)}" target="_blank" rel="noopener">💬 WhatsApp</a></div>
+  <div class="sm"><button data-e="${id}">बदलें</button><button class="del" data-d="${id}">हटाएँ</button><button id="cl">बंद करें</button></div>`);
+}
+function form(id){
+  const d=data.find(x=>x.id===id)||{name:"",phone:"",cat:filter==="सभी"?"ग्राहक":filter,note:""};
+  open(`<p class="big">${id?"संपर्क बदलें":"नया संपर्क"}</p>
+  <label>नाम</label><input id="fn" value="${esc(d.name)}">
+  <label>मोबाइल नंबर</label><input id="fp" type="tel" inputmode="tel" value="${esc(d.phone)}">
+  <label>किस तरह का संपर्क</label><select id="fc">${CATS.map(c=>`<option ${c[0]===d.cat?"selected":""}>${c[0]}</option>`).join("")}</select>
+  <label>नोट (चाहें तो)</label><input id="fo" value="${esc(d.note)}">
+  <button class="save" id="sv" data-id="${id||""}">सेव करें</button>`);
+}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.c){filter=t.dataset.c;render()}
+  else if(t.classList.contains("row"))view(t.dataset.id);
+  else if(t.id==="add")form();
+  else if(t.id==="cl")close();
+  else if(t.id==="rf")load();
+  else if(t.id==="st")setup();
+  else if(t.id==="su"){const u=$("fu").value.trim();if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){alert("लिंक https://script.google.com/... से शुरू होकर /exec पर खत्म होनी चाहिए");return}
+    api=u;try{localStorage.setItem(URLK,u)}catch(_){}close();load()}
+  else if(t.dataset.e)form(t.dataset.e);
+  else if(t.dataset.d){if(confirm("यह संपर्क हटा दें?")){const id=t.dataset.d;data=data.filter(x=>x.id!==id);cache();close();render();push({action:"delete",id})}}
+  else if(t.id==="sv"){
+    const name=$("fn").value.trim(),phone=$("fp").value.trim();
+    if(!name||digits(phone).length<10){alert("नाम और कम से कम 10 अंकों का नंबर लिखें");return}
+    const rec={id:t.dataset.id||("c"+Date.now()),name,phone,cat:$("fc").value,note:$("fo").value.trim()};
+    const i=data.findIndex(x=>x.id===rec.id);i>=0?data[i]=rec:data.push(rec);
+    cache();close();render();push({action:"save",...rec});
+  }
+});
+$("bk").addEventListener("click",e=>{if(e.target===$("bk"))close()});
+$("q").addEventListener("input",render);
+render();load();
+</script>
+</body>
+</html>
