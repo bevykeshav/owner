@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Crave Kitchen – संपर्क</title>
+<title>क्रेव संपर्क</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#C8102E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="क्रेव संपर्क">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F2F4F0;--card:#fff;--ink:#14231C;--mute:#5F6F66;--line:#DDE3DC;--red:#C8102E;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
@@ -42,8 +50,9 @@ h1{margin:0;font-size:22px;font-weight:700}
 label{display:block;margin:12px 0 4px;font-size:14px;color:var(--mute)}
 input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
 .save{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;background:var(--red);color:#fff;font:inherit;font-weight:700}
-.foot{display:flex;gap:10px;justify-content:center;margin:18px 16px 0}
+.foot{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 16px 0}
 .foot button{background:none;border:1px solid var(--line);color:var(--mute);padding:8px 14px;border-radius:10px;font:inherit;font-size:14px}
+.cr{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}.dot{width:12px;height:12px;border-radius:50%;flex:none}.cn{flex:1}.cr button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit;font-size:14px}.cr .del{color:var(--red)}
 :focus-visible{outline:2px solid var(--red);outline-offset:2px}
 </style>
 </head>
@@ -52,16 +61,21 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);borde
 <input class="search" id="q" type="search" placeholder="नाम या नंबर खोजें">
 <div class="chips" id="chips"></div>
 <div class="list" id="list"></div>
-<div class="foot"><button id="rf">🔄 शीट से रीफ़्रेश</button><button id="st">⚙️ शीट लिंक</button></div>
+<div class="foot"><button id="rf">🔄 शीट से रीफ़्रेश</button><button id="imp">📥 पुराने नंबर जोड़ें</button></div>
+<input type="file" id="imf" accept=".xlsx,.xls,.csv" hidden>
 <button class="fab" id="add">+ नया नंबर</button>
 
 <div class="bk" id="bk"><div class="sheet" id="sheet"></div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const CATS=[["ग्राहक","#C8102E"],["वर्कर","#1B6EF3"],["हेल्पर","#8A5A00"],["डीलर","#6B3FA0"],["सप्लायर","#0E7C66"]];
-const KEY="crave_contacts_v1",URLK="crave_contacts_api";
-let data=[],filter="सभी",api="",status="";
-try{data=JSON.parse(localStorage.getItem(KEY)||"[]");api=localStorage.getItem(URLK)||""}catch(e){}
+const PAL=["#C8102E","#1B6EF3","#8A5A00","#6B3FA0","#0E7C66","#D6336C","#2B8A3E","#E8590C","#0B7285","#5C3D2E"];
+let CATS=[["ग्राहक",PAL[0]],["वर्कर",PAL[1]],["हेल्पर",PAL[2]],["डीलर",PAL[3]],["सप्लायर",PAL[4]]];
+const KEY="crave_contacts_v1",URLK="crave_contacts_api",DEFAULT_API="https://script.google.com/macros/s/AKfycbwxkTBq0UohF9xuiONhwg9vb2U5Z_0mK-h_DijlOaIUmKRShOT0YAv_xomvF-EHE02B7g/exec";
+let data=[],filter="सभी",api=DEFAULT_API,status="";
+try{data=JSON.parse(localStorage.getItem(KEY)||"[]");api=localStorage.getItem(URLK)||DEFAULT_API}catch(e){}
+try{const c=JSON.parse(localStorage.getItem("crave_cats_v1")||"null");if(Array.isArray(c)&&c.length)CATS=c}catch(e){}
+const cacheCats=()=>{try{localStorage.setItem("crave_cats_v1",JSON.stringify(CATS))}catch(e){}};
 const $=id=>document.getElementById(id);
 const cache=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
 const color=c=>(CATS.find(x=>x[0]===c)||[0,"#555"])[1];
@@ -83,14 +97,14 @@ function push(p){
 function load(){
   if(!api){setup();return}
   setStatus("शीट से ला रहे हैं…");
-  jsonp({action:"list"}).then(r=>{if(r&&r.ok){data=r.rows;cache();render();setStatus("शीट से अपडेट")}else setStatus("शीट पढ़ नहीं पाए")})
+  jsonp({action:"list"}).then(r=>{if(r&&r.ok){data=r.rows;if(Array.isArray(r.cats)&&r.cats.length){CATS=r.cats;cacheCats()}cache();render();setStatus("शीट से अपडेट")}else setStatus("शीट पढ़ नहीं पाए")})
    .catch(()=>setStatus("शीट से नहीं जुड़ पाए (पुराने नंबर दिख रहे हैं)"));
 }
 function render(){
   const q=$("q").value.trim().toLowerCase();
   $("chips").innerHTML=["सभी",...CATS.map(c=>c[0])].map(c=>{
     const n=c==="सभी"?data.length:data.filter(d=>d.cat===c).length;
-    return `<button class="chip ${c===filter?"on":""}" data-c="${c}">${c} (${n})</button>`}).join("");
+    return `<button class="chip ${c===filter?"on":""}" data-c="${c}">${c} (${n})</button>`}).join("")+`<button class="chip" id="mc">✏️ प्रकार</button>`;
   const rows=data.filter(d=>(filter==="सभी"||d.cat===filter)&&(!q||d.name.toLowerCase().includes(q)||d.phone.includes(q)))
     .sort((a,b)=>a.name.localeCompare(b.name,"hi"));
   setStatus(status);
@@ -119,9 +133,81 @@ function form(id){
   <label>नोट (चाहें तो)</label><input id="fo" value="${esc(d.note)}">
   <button class="save" id="sv" data-id="${id||""}">सेव करें</button>`);
 }
+function pushCats(extra){cacheCats();if(!api)return;setStatus("शीट में सेव हो रहा है…");
+  jsonp({action:"savecats",cats:JSON.stringify(CATS)}).then(()=>extra?jsonp(extra):0).then(()=>setStatus("शीट में सेव हो गया")).catch(()=>setStatus("इंटरनेट/शीट लिंक की दिक्कत, दोबारा कोशिश करें"))}
+function manage(){open(`<p class="big">संपर्क के प्रकार</p><div>${CATS.map((c,i)=>`<div class="cr"><span class="dot" style="background:${c[1]}"></span><span class="cn">${esc(c[0])} <span class="ph">(${data.filter(d=>d.cat===c[0]).length})</span></span><button data-cr="${i}">नाम बदलें</button><button class="del" data-cd="${i}">हटाएँ</button></div>`).join("")}</div>
+  <label>नया प्रकार जोड़ें</label><input id="nc" placeholder="जैसे: रिश्तेदार">
+  <button class="save" id="ca">+ प्रकार जोड़ें</button><div class="sm" style="margin-top:10px"><button id="cl">बंद करें</button></div>`)}
+function addCat(){const n=$("nc").value.trim();if(!n)return;if(CATS.some(c=>c[0]===n)){alert("यह प्रकार पहले से है");return}
+  const used=CATS.map(c=>c[1]);CATS.push([n,PAL.find(x=>!used.includes(x))||PAL[CATS.length%PAL.length]]);pushCats();render();manage()}
+function renCat(i){const old=CATS[i][0],n=(prompt("नया नाम लिखें",old)||"").trim();if(!n||n===old)return;
+  if(CATS.some(c=>c[0]===n)){alert("यह नाम पहले से है");return}
+  CATS[i][0]=n;data.forEach(d=>{if(d.cat===old)d.cat=n});if(filter===old)filter=n;cache();pushCats({action:"renamecat",from:old,to:n});render();manage()}
+function delCat(i){const c=CATS[i][0];if(CATS.length<2){alert("कम से कम एक प्रकार रहना चाहिए");return}
+  if(data.some(d=>d.cat===c)){alert("\""+c+"\" में अभी संपर्क हैं। पहले उन्हें दूसरे प्रकार में करें, फिर हटाएँ।");return}
+  if(!confirm("\""+c+"\" प्रकार हटा दें?"))return;CATS.splice(i,1);if(filter===c)filter="सभी";pushCats();render();manage()}
+
+/* ---- पुराने नंबर Excel/CSV से जोड़ना ---- */
+let pend=[];
+const last10=v=>{let d=String(v==null?"":v).replace(/\.0+$/,"").replace(/\D/g,"");if(d.length===12&&d.slice(0,2)==="91")d=d.slice(2);if(d.length===11&&d[0]==="0")d=d.slice(1);return /^[6-9]\d{9}$/.test(d)?d:""};
+function parseWb(wb){
+  const out=[];
+  wb.SheetNames.forEach(sn=>{
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:""});
+    if(!rows.length)return;
+    const h=rows[0].map(x=>String(x).toLowerCase());
+    const ni=h.findIndex(x=>/name|naam|नाम/.test(x)),pi=h.findIndex(x=>/phone|mobile|number|no\.|नंबर|मोबाइल/.test(x));
+    rows.slice(1).forEach(r=>{
+      let ph="";
+      if(pi>=0)ph=last10(r[pi]);
+      if(!ph)for(const c of r){ph=last10(c);if(ph)break}
+      if(!ph)return;
+      let nm=ni>=0?String(r[ni]||"").trim():"";
+      if(!nm)nm=(r.map(c=>typeof c==="string"?c.trim():"").find(c=>c&&/\p{L}/u.test(c)&&!/^[0-9a-f]{8}$/i.test(c)&&!/^(yes|no)$/i.test(c)&&!/^\d{4}-\d\d-\d\d/.test(c)&&c!==ph))||"";
+      out.push({name:nm||"ग्राहक "+ph.slice(-4),phone:ph});
+    });
+  });
+  return out;
+}
+async function pickFile(f){
+  if(!f)return;
+  if(!window.XLSX){alert("फ़ाइल पढ़ने वाली लाइब्रेरी लोड नहीं हुई। इंटरनेट चालू करके दोबारा कोशिश करें।");return}
+  try{
+    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+    const have=new Set(data.map(d=>last10(d.phone))),seen=new Set(),fresh=[];let dup=0;
+    parseWb(wb).forEach(x=>{if(have.has(x.phone)||seen.has(x.phone)){dup++;return}seen.add(x.phone);fresh.push(x)});
+    pend=fresh;
+    if(!fresh.length){open(`<p class="big">कोई नया नंबर नहीं मिला</p><div class="ph" style="margin-top:6px">${dup?dup+" नंबर पहले से ऐप में हैं।":"फ़ाइल में 10 अंकों के मोबाइल नंबर नहीं दिखे।"}</div><div class="sm" style="margin-top:14px"><button id="cl">बंद करें</button></div>`);return}
+    open(`<p class="big">पुराने नंबर जोड़ें</p>
+    <div class="ph" style="margin-top:6px">${fresh.length} नए नंबर मिले${dup?" ("+dup+" पहले से ऐप में हैं, इसलिए छोड़ दिए)":""}</div>
+    <div class="ph" style="margin-top:6px">जैसे: ${esc(fresh.slice(0,3).map(x=>x.name+" "+x.phone).join(", "))}</div>
+    <label>किस तरह का संपर्क</label><select id="ic">${CATS.map(c=>`<option ${c[0]==="ग्राहक"?"selected":""}>${c[0]}</option>`).join("")}</select>
+    <button class="save" id="idoit">${fresh.length} नंबर जोड़ें</button>
+    <div class="sm" style="margin-top:10px"><button id="cl">रद्द करें</button></div>`);
+  }catch(e){alert("फ़ाइल नहीं पढ़ पाए। .xlsx या .csv फ़ाइल चुनें।")}
+  $("imf").value="";
+}
+async function runImport(){
+  const cat=$("ic").value,recs=pend.map(x=>({id:"ig"+x.phone,name:x.name,phone:x.phone,cat,note:"पुराना ग्राहक"}));
+  data.push(...recs);cache();render();
+  $("sheet").innerHTML=`<p class="big">नंबर सेव हो रहे हैं…</p><div class="ph" id="ipr" style="margin-top:8px">0 / ${recs.length}</div><div class="ph" style="margin-top:8px">कृपया यह स्क्रीन बंद न करें।</div>`;
+  let i=0,done=0,fail=0;
+  const w=async()=>{while(i<recs.length){const r=recs[i++];try{const x=await jsonp({action:"save",...r});if(!(x&&x.ok))fail++}catch(e){fail++}done++;const p=$("ipr");if(p)p.textContent=done+" / "+recs.length}};
+  await Promise.all([w(),w(),w()]);
+  pend=[];
+  $("sheet").innerHTML=`<p class="big">${fail?"काम पूरा, कुछ नंबर रह गए":"सब नंबर जुड़ गए"}</p><div class="ph" style="margin-top:8px">${recs.length-fail} नंबर शीट में सेव हुए${fail?", "+fail+" सेव नहीं हुए (दोबारा वही फ़ाइल चुनेंगे तो सिर्फ़ रहे हुए नंबर आएँगे)":""}।</div><div class="sm" style="margin-top:14px"><button id="cl">बंद करें</button></div>`;
+  setStatus(fail?"कुछ नंबर सेव नहीं हुए":"शीट में सेव हो गया");
+}
+
 document.addEventListener("click",e=>{
   const t=e.target.closest("button");if(!t)return;
-  if(t.dataset.c){filter=t.dataset.c;render()}
+  if(t.id==="mc")manage();
+  else if(t.id==="imp")$("imf").click();
+  else if(t.id==="idoit")runImport();
+  else if(t.id==="ca")addCat();
+  else if(t.dataset.cr!==undefined)renCat(+t.dataset.cr);
+  else if(t.dataset.cd!==undefined)delCat(+t.dataset.cd);
+  else if(t.dataset.c){filter=t.dataset.c;render()}
   else if(t.classList.contains("row"))view(t.dataset.id);
   else if(t.id==="add")form();
   else if(t.id==="cl")close();
@@ -139,9 +225,11 @@ document.addEventListener("click",e=>{
     cache();close();render();push({action:"save",...rec});
   }
 });
+$("imf").addEventListener("change",e=>pickFile(e.target.files[0]));
 $("bk").addEventListener("click",e=>{if(e.target===$("bk"))close()});
 $("q").addEventListener("input",render);
 render();load();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>
