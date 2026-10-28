@@ -396,9 +396,8 @@ Rules:
 Example output:
 Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
 Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM`;
-    navigator.clipboard.writeText(prompt).then(()=>{
-      alert("✅ Prompt copied!\n\n1. Open ChatGPT app\n2. Upload image\n3. Paste (Ctrl+V or Cmd+V)");
-    }).catch(()=>{alert("Error copying")});
+    navigator.clipboard.writeText(prompt);
+    alert("Prompt copied! Open ChatGPT app now");
   }
   else if(t.id==="open-chatgpt"){
     const prompt=$("prompt-text").value;
