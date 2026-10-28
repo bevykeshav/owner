@@ -58,9 +58,68 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);borde
 </head>
 <body>
 <header><h1>Crave Kitchen संपर्क</h1><div class="sub" id="cnt"></div></header>
+<div style="display:flex;gap:4px;padding:10px 16px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none">
+<button class="chip" id="mode-contacts" style="flex:none;border-radius:20px;padding:8px 14px;border:1px solid var(--line);background:var(--red);color:#fff;border-color:var(--red)">👥 संपर्क</button>
+<button class="chip" id="mode-tracker" style="flex:none;border-radius:20px;padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink)">📊 ट्रैकर</button>
+</div>
+
+<!-- Contacts Section -->
+<div id="section-contacts" style="display:block">
 <input class="search" id="q" type="search" placeholder="नाम या नंबर खोजें">
 <div class="chips" id="chips"></div>
 <div class="list" id="list"></div>
+</div>
+
+<!-- Tracker Section -->
+<div id="section-tracker" style="display:none;padding:16px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+<button class="save" id="show-prompt" style="background:#1B6EF3;margin:0">📋 ChatGPT Prompt</button>
+<button class="save" id="hide-prompt" style="background:#666;margin:0;display:none">छिपाएँ</button>
+</div>
+
+<div id="prompt-box" style="display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px">
+<textarea readonly style="width:100%;height:150px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical;font-size:12px;font-family:monospace;padding:10px" id="prompt-text">Extract customer transaction details from this image and return ONLY in this exact format (one line per transaction):
+
+Name: [customer name] | Amount: [amount in numbers only] | Date: [YYYY-MM-DD format] | Time: [HH:MM AM/PM format]
+
+Rules:
+- Extract only the name (no titles like Mr, Mrs, Shri)
+- Amount should be numbers only
+- Date should be YYYY-MM-DD (example: 2026-10-28)
+- Time should be in HH:MM AM/PM format (example: 2:30 PM)
+- If any field is missing, write "unknown"
+
+Example output:
+Name: राज | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
+Name: प्रिया | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM</textarea>
+<button class="save" id="copy-prompt" style="width:100%;margin-top:8px">📋 कॉपी करें</button>
+</div>
+
+<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--mute)">पेस्ट करें: Name: राज | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM</div>
+<textarea id="tracker-input" rows="5" placeholder="Name: राज | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM&#10;Name: प्रिया | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;resize:vertical"></textarea>
+<button class="save" id="tracker-add" style="width:100%;margin-top:10px">➕ डेटा जोड़ें</button>
+<button class="save" id="tracker-clear" style="width:100%;margin-top:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)">🗑️ सब हटाएँ</button>
+
+<div style="margin-top:20px">
+<h3 style="margin:0 0 10px;font-size:16px">📈 विश्लेषण</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px">
+<div style="color:var(--mute);font-size:12px">कुल ग्राहक</div>
+<div style="font-size:22px;font-weight:700;color:var(--red);margin-top:4px" id="t-customers">0</div>
+</div>
+<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px">
+<div style="color:var(--mute);font-size:12px">कुल आय</div>
+<div style="font-size:22px;font-weight:700;color:var(--red);margin-top:4px" id="t-total">₹0</div>
+</div>
+</div>
+
+<h4 style="margin:12px 0 8px;font-size:14px">🏆 सबसे जयादा खर्च करने वाले</h4>
+<div id="t-spenders"></div>
+
+<h4 style="margin:12px 0 8px;font-size:14px">🔄 सबसे ज्यादा आने वाले</h4>
+<div id="t-frequent"></div>
+</div>
+</div>
 <div class="foot"><button id="rf">🔄 शीट से रीफ़्रेश</button><button id="imp">📥 पुराने नंबर जोड़ें</button></div>
 <input type="file" id="imf" accept=".xlsx,.xls,.csv" hidden>
 <button class="fab" id="add">+ नया नंबर</button>
@@ -71,13 +130,19 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);borde
 <script>
 const PAL=["#C8102E","#1B6EF3","#8A5A00","#6B3FA0","#0E7C66","#D6336C","#2B8A3E","#E8590C","#0B7285","#5C3D2E"];
 let CATS=[["ग्राहक",PAL[0]],["वर्कर",PAL[1]],["हेल्पर",PAL[2]],["डीलर",PAL[3]],["सप्लायर",PAL[4]]];
-const KEY="crave_contacts_v1",URLK="crave_contacts_api",DEFAULT_API="https://script.google.com/macros/s/AKfycbwxkTBq0UohF9xuiONhwg9vb2U5Z_0mK-h_DijlOaIUmKRShOT0YAv_xomvF-EHE02B7g/exec";
-let data=[],filter="सभी",api=DEFAULT_API,status="";
+const KEY="crave_contacts_v1",URLK="crave_contacts_api",PAYMENTSKEY="crave_payments_v1",TRACKERKEY="crave_tracker_v1",DEFAULT_API="https://script.google.com/macros/s/AKfycbwxkTBq0UohF9xuiONhwg9vb2U5Z_0mK-h_DijlOaIUmKRShOT0YAv_xomvF-EHE02B7g/exec";
+let data=[],payments={},trackerData=[],filter="सभी",api=DEFAULT_API,status="";
 try{data=JSON.parse(localStorage.getItem(KEY)||"[]");api=localStorage.getItem(URLK)||DEFAULT_API}catch(e){}
+try{payments=JSON.parse(localStorage.getItem(PAYMENTSKEY)||"{}")}catch(e){}
+try{trackerData=JSON.parse(localStorage.getItem(TRACKERKEY)||"[]")}catch(e){}
 try{const c=JSON.parse(localStorage.getItem("crave_cats_v1")||"null");if(Array.isArray(c)&&c.length)CATS=c}catch(e){}
 const cacheCats=()=>{try{localStorage.setItem("crave_cats_v1",JSON.stringify(CATS))}catch(e){}};
 const $=id=>document.getElementById(id);
 const cache=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+const cachePayments=()=>{try{localStorage.setItem(PAYMENTSKEY,JSON.stringify(payments))}catch(e){}};
+const cacheTracker=()=>{try{localStorage.setItem(TRACKERKEY,JSON.stringify(trackerData))}catch(e){}};
+const getPayments=id=>payments[id]||[];
+const getTotalSpent=id=>{const p=getPayments(id);return p.reduce((sum,x)=>sum+(x.amount||0),0)};
 const color=c=>(CATS.find(x=>x[0]===c)||[0,"#555"])[1];
 const digits=n=>n.replace(/\D/g,"");
 const wa=n=>{let d=digits(n);if(d.length===10)d="91"+d;else if(d.length===11&&d[0]==="0")d="91"+d.slice(1);return "https://wa.me/"+d};
@@ -108,7 +173,7 @@ function render(){
   const rows=data.filter(d=>(filter==="सभी"||d.cat===filter)&&(!q||d.name.toLowerCase().includes(q)||d.phone.includes(q)))
     .sort((a,b)=>a.name.localeCompare(b.name,"hi"));
   setStatus(status);
-  $("list").innerHTML=rows.length?rows.map(d=>`<button class="row" data-id="${d.id}"><span class="av" style="background:${color(d.cat)}">${esc(d.name.trim()[0]||"?")}</span><span><div class="nm">${esc(d.name)}</div><div class="ph">${esc(d.phone)}</div></span><span class="tag">${d.cat}</span></button>`).join("")
+  $("list").innerHTML=rows.length?rows.map(d=>{const total=getTotalSpent(d.id);return `<button class="row" data-id="${d.id}"><span class="av" style="background:${color(d.cat)}">${esc(d.name.trim()[0]||"?")}</span><span><div class="nm">${esc(d.name)}</div><div class="ph">${esc(d.phone)}</div>${total?`<div class="ph" style="font-size:12px;margin-top:2px">💰 ₹${total}</div>`:""}</span><span class="tag">${d.cat}</span></button>`}).join("")
     :`<div class="empty">${data.length?"कोई संपर्क नहीं मिला":"अभी कोई नंबर नहीं है। नीचे \"+ नया नंबर\" दबाकर पहला संपर्क जोड़ें।"}</div>`;
 }
 const open=h=>{$("sheet").innerHTML=h;$("bk").classList.add("open")};
@@ -120,7 +185,12 @@ function setup(){
 }
 function view(id){
   const d=data.find(x=>x.id===id);if(!d)return;
+  const total=getTotalSpent(id),pays=getPayments(id);
+  const payHtml=pays.length?pays.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(p=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);align-items:center"><div><div class="nm">₹${p.amount}</div><div class="ph" style="font-size:12px">${new Date(p.date).toLocaleDateString('hi-IN')}</div></div><button class="del" style="padding:4px 8px;font-size:12px" data-dp="${id}|${p.date}">हटाएँ</button></div>`).join(""):`<div class="ph" style="padding:8px 0">कोई भुगतान नहीं</div>`;
   open(`<p class="big">${esc(d.name)}</p><div class="ph">${esc(d.phone)} • ${d.cat}</div>${d.note?`<div class="ph" style="margin-top:6px">${esc(d.note)}</div>`:""}
+  <div style="margin-top:12px;padding:12px;background:var(--line);border-radius:10px"><div class="ph">कुल खर्च</div><div style="font-size:20px;font-weight:700;color:var(--red)">₹${total}</div></div>
+  <div style="margin-top:12px"><label style="display:block;margin:0 0 8px 0">भुगतान का इतिहास</label><div style="border:1px solid var(--line);border-radius:10px;padding:10px;max-height:200px;overflow-y:auto">${payHtml}</div></div>
+  <button class="save" id="addpay" data-id="${id}" style="margin-top:12px">💰 भुगतान जोड़ें</button>
   <div class="acts"><a class="a call" href="tel:${digits(d.phone)}">📞 कॉल करें</a><a class="a wa" href="${wa(d.phone)}" target="_blank" rel="noopener">💬 WhatsApp</a></div>
   <div class="sm"><button data-e="${id}">बदलें</button><button class="del" data-d="${id}">हटाएँ</button><button id="cl">बंद करें</button></div>`);
 }
@@ -132,6 +202,137 @@ function form(id){
   <label>किस तरह का संपर्क</label><select id="fc">${CATS.map(c=>`<option ${c[0]===d.cat?"selected":""}>${c[0]}</option>`).join("")}</select>
   <label>नोट (चाहें तो)</label><input id="fo" value="${esc(d.note)}">
   <button class="save" id="sv" data-id="${id||""}">सेव करें</button>`);
+}
+function addPaymentForm(id){
+  open(`<p class="big">भुगतान दर्ज करें</p>
+  <label>रकम (₹)</label><input id="payamt" type="number" inputmode="decimal" placeholder="100">
+  <label>तारीख</label><input id="paydate" type="date" value="${new Date().toISOString().split('T')[0]}">
+  <button class="save" id="savepay" data-id="${id}">✅ भुगतान सेव करें</button>
+  <div class="sm" style="margin-top:10px"><button id="cl">रद्द करें</button></div>`);
+}
+function parseTrackerInput(text){
+  const lines=text.split('\n').filter(x=>x.trim());
+  const trans=[];
+  lines.forEach(line=>{
+    const parts={};
+    line.split('|').forEach(p=>{
+      const [k,v]=p.split(':');
+      const key=k.trim().toLowerCase();
+      const val=v.trim();
+      if(key.includes('name')||key.includes('नाम'))parts.name=val;
+      else if(key.includes('amount')||key.includes('रकम'))parts.amount=parseFloat(val)||0;
+      else if(key.includes('date')||key.includes('तारीख'))parts.date=val;
+      else if(key.includes('time')||key.includes('समय'))parts.time=val;
+    });
+    if(parts.name&&parts.amount)trans.push({...parts,id:Date.now()+Math.random()});
+  });
+  return trans;
+}
+function renderTracker(){
+  const byName={};
+  trackerData.forEach(t=>{
+    if(!byName[t.name])byName[t.name]={total:0,count:0,dates:[]};
+    byName[t.name].total+=t.amount;
+    byName[t.name].count+=1;
+    byName[t.name].dates.push(t.date);
+  });
+
+  const totalAmt=Object.values(byName).reduce((s,x)=>s+x.total,0);
+  $("t-customers").textContent=Object.keys(byName).length;
+  $("t-total").textContent="₹"+totalAmt;
+
+  const spenders=Object.entries(byName).sort((a,b)=>b[1].total-a[1].total).slice(0,5);
+  $("t-spenders").innerHTML=spenders.map(([name,data])=>
+    `<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="showTrackerDetail('${name}')">
+      <div style="font-weight:500">${name}</div>
+      <div style="display:flex;gap:12px;margin-top:6px;font-size:12px;color:var(--mute)">
+        <span>💰 ₹${data.total}</span>
+        <span>📊 ${data.count} बार</span>
+      </div>
+    </div>`
+  ).join("")||"<div style='color:var(--mute);padding:10px'>कोई डेटा नहीं</div>";
+
+  const frequent=Object.entries(byName).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
+  $("t-frequent").innerHTML=frequent.map(([name,data])=>
+    `<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="showTrackerDetail('${name}')">
+      <div style="font-weight:500">${name}</div>
+      <div style="display:flex;gap:12px;margin-top:6px;font-size:12px;color:var(--mute)">
+        <span>🔄 ${data.count} बार</span>
+        <span>💰 ₹${data.total}</span>
+      </div>
+    </div>`
+  ).join("")||"<div style='color:var(--mute);padding:10px'>कोई डेटा नहीं</div>";
+}
+function showTrackerDetail(name){
+  const cusTrans=trackerData.filter(t=>t.name===name).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total=cusTrans.reduce((s,t)=>s+t.amount,0);
+
+  open(`<p class="big">${esc(name)}</p>
+  <div style="margin-top:12px;padding:12px;background:var(--line);border-radius:10px">
+    <div class="ph">कुल खर्च</div>
+    <div style="font-size:20px;font-weight:700;color:var(--red)">₹${total}</div>
+  </div>
+  <div style="margin-top:12px">
+    <label style="display:block;margin:0 0 8px 0">ट्रांजैक्शन हिस्ट्री</label>
+    <div style="border:1px solid var(--line);border-radius:10px;padding:10px;max-height:300px;overflow-y:auto">
+    ${cusTrans.map(t=>`
+      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);align-items:center">
+        <div>
+          <div style="font-weight:500">${t.date}</div>
+          <div class="ph" style="font-size:12px">${t.time||"--"}</div>
+        </div>
+        <div style="font-weight:700;color:var(--red)">₹${t.amount}</div>
+      </div>
+    `).join("")}
+    </div>
+  </div>
+  <div class="sm" style="margin-top:14px"><button id="cl">बंद करें</button></div>`);
+}
+function parseCustomerData(text){
+  const lines=text.split('\n');
+  const data={};
+  lines.forEach(line=>{
+    const [key,...val]=line.split(':');
+    const value=val.join(':').trim();
+    const cleanKey=key.trim().toLowerCase();
+    if(cleanKey.includes('name')||cleanKey.includes('नाम'))data.name=value;
+    else if(cleanKey.includes('phone')||cleanKey.includes('नंबर')||cleanKey.includes('मोबाइल'))data.phone=value;
+    else if(cleanKey.includes('amount')||cleanKey.includes('रकम'))data.amount=value;
+    else if(cleanKey.includes('date')||cleanKey.includes('तारीख'))data.date=value;
+  });
+  return data;
+}
+function pasteForm(){
+  open(`<p class="big">📋 डेटा पेस्ट करें</p>
+  <div class="ph" style="margin-top:6px">ChatGPT से कॉपी किया हुआ टेक्स्ट यहाँ पेस्ट करें:</div>
+  <textarea id="pastetext" placeholder="Name: राज कुमार&#10;Phone: 9876543210&#10;Amount: 2500&#10;Date: 2026-10-28" style="height:120px;margin-top:10px;font-family:monospace;font-size:13px"></textarea>
+  <button class="save" id="doParse">✅ भरें</button>
+
+  <p class="big" style="margin-top:20px;font-size:18px">नीचे का प्रॉम्प्ट कॉपी करें:</p>
+  <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px">
+    <textarea readonly style="width:100%;height:180px;border:none;background:var(--bg);color:var(--ink);font:inherit;resize:none;font-size:12px;font-family:monospace">Extract customer payment details from this image/text and return ONLY in this exact format (one line each):
+
+Name: [customer name]
+Phone: [10 digit mobile number without +91]
+Amount: [payment amount in numbers only]
+Date: [YYYY-MM-DD format]
+
+Rules:
+- Extract only the name (remove titles like Mr, Mrs, Shri)
+- Phone should be exactly 10 digits
+- Amount should be numbers only
+- Date should be in YYYY-MM-DD format (example: 2026-10-28)
+- If any field is missing, write "unknown"
+
+Example output:
+Name: राज कुमार
+Phone: 9876543210
+Amount: 2500
+Date: 2026-10-28</textarea>
+    <button id="cp" style="width:100%;margin-top:8px;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;cursor:pointer">📋 कॉपी करें</button>
+  </div>
+
+  <div class="sm" style="margin-top:14px"><button id="cl">रद्द करें</button></div>`);
 }
 function pushCats(extra){cacheCats();if(!api)return;setStatus("शीट में सेव हो रहा है…");
   jsonp({action:"savecats",cats:JSON.stringify(CATS)}).then(()=>extra?jsonp(extra):0).then(()=>setStatus("शीट में सेव हो गया")).catch(()=>setStatus("इंटरनेट/शीट लिंक की दिक्कत, दोबारा कोशिश करें"))}
@@ -201,7 +402,63 @@ async function runImport(){
 
 document.addEventListener("click",e=>{
   const t=e.target.closest("button");if(!t)return;
-  if(t.id==="mc")manage();
+  if(t.id==="show-prompt"){
+    $("prompt-box").style.display="block";
+    $("show-prompt").style.display="none";
+    $("hide-prompt").style.display="block";
+  }
+  else if(t.id==="hide-prompt"){
+    $("prompt-box").style.display="none";
+    $("show-prompt").style.display="block";
+    $("hide-prompt").style.display="none";
+  }
+  else if(t.id==="copy-prompt"){
+    const prompt=$("prompt-text").value;
+    navigator.clipboard.writeText(prompt).then(()=>{
+      alert("प्रॉम्प्ट कॉपी हो गया! ChatGPT में पेस्ट करो");
+    }).catch(()=>{alert("कॉपी करने में दिक्कत हुई")});
+  }
+  else if(t.id==="mode-contacts"){
+    $("mode-contacts").style.background="#C8102E";
+    $("mode-contacts").style.color="#fff";
+    $("mode-contacts").style.borderColor="#C8102E";
+    $("mode-tracker").style.background="var(--card)";
+    $("mode-tracker").style.color="var(--ink)";
+    $("mode-tracker").style.borderColor="var(--line)";
+    $("section-contacts").style.display="block";
+    $("section-tracker").style.display="none";
+  }
+  else if(t.id==="mode-tracker"){
+    $("mode-tracker").style.background="#C8102E";
+    $("mode-tracker").style.color="#fff";
+    $("mode-tracker").style.borderColor="#C8102E";
+    $("mode-contacts").style.background="var(--card)";
+    $("mode-contacts").style.color="var(--ink)";
+    $("mode-contacts").style.borderColor="var(--line)";
+    $("section-contacts").style.display="none";
+    $("section-tracker").style.display="block";
+    renderTracker();
+  }
+  else if(t.id==="tracker-add"){
+    const text=$("tracker-input").value;
+    if(!text.trim()){alert("कुछ डेटा पेस्ट करें");return}
+    const newTrans=parseTrackerInput(text);
+    if(!newTrans.length){alert("सही फॉर्मेट में डेटा डालें");return}
+    trackerData.push(...newTrans);
+    cacheTracker();
+    $("tracker-input").value="";
+    alert(`${newTrans.length} ट्रांजैक्शन जोड़े गए!`);
+    renderTracker();
+  }
+  else if(t.id==="tracker-clear"){
+    if(confirm("सब डेटा हटा दूँ?")){
+      trackerData=[];
+      cacheTracker();
+      alert("सब डेटा हटा दिया गया");
+      renderTracker();
+    }
+  }
+  else if(t.id==="mc")manage();
   else if(t.id==="imp")$("imf").click();
   else if(t.id==="idoit")runImport();
   else if(t.id==="ca")addCat();
@@ -216,7 +473,22 @@ document.addEventListener("click",e=>{
   else if(t.id==="su"){const u=$("fu").value.trim();if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){alert("लिंक https://script.google.com/... से शुरू होकर /exec पर खत्म होनी चाहिए");return}
     api=u;try{localStorage.setItem(URLK,u)}catch(_){}close();load()}
   else if(t.dataset.e)form(t.dataset.e);
-  else if(t.dataset.d){if(confirm("यह संपर्क हटा दें?")){const id=t.dataset.d;data=data.filter(x=>x.id!==id);cache();close();render();push({action:"delete",id})}}
+  else if(t.dataset.d){if(confirm("यह संपर्क हटा दें?")){const id=t.dataset.d;data=data.filter(x=>x.id!==id);delete payments[id];cache();cachePayments();close();render();push({action:"delete",id})}}
+  else if(t.id==="addpay")addPaymentForm(t.dataset.id);
+  else if(t.id==="savepay"){
+    const id=t.dataset.id,amt=parseFloat($("payamt").value);
+    if(!amt||amt<=0){alert("सही रकम लिखें");return}
+    if(!payments[id])payments[id]=[];
+    payments[id].push({amount:amt,date:$("paydate").value});
+    cachePayments();close();view(id);push({action:"payment",id,amount:amt,date:$("paydate").value});
+  }
+  else if(t.dataset.dp){
+    const [id,date]=t.dataset.dp.split("|");
+    if(confirm("यह भुगतान हटा दें?")){
+      payments[id]=payments[id].filter(p=>p.date!==date);
+      cachePayments();view(id);
+    }
+  }
   else if(t.id==="sv"){
     const name=$("fn").value.trim(),phone=$("fp").value.trim();
     if(!name||digits(phone).length<10){alert("नाम और कम से कम 10 अंकों का नंबर लिखें");return}
