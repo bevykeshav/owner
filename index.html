@@ -71,15 +71,8 @@ input,select,textarea{width:100%;padding:14px;border:1px solid var(--line);borde
 <div class="list" id="list"></div>
 </div>
 
-<!-- Tracker Section -->
-<div id="section-tracker" style="display:none;padding:16px">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;border-bottom:2px solid var(--line);padding-bottom:12px">
-<button class="chip" id="tab-input" style="flex:none;width:100%;border-radius:10px;padding:12px;border:none;background:var(--red);color:#fff;font-weight:700;cursor:pointer;font-size:15px">📝 Input</button>
-<button class="chip" id="tab-analytics" style="flex:none;width:100%;border-radius:10px;padding:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;cursor:pointer;font-size:15px">📊 View</button>
-</div>
-
-<!-- Add Data Tab -->
-<div id="tab-input-section">
+<!-- Tracker Section - Input Form -->
+<div id="section-input" style="display:none;padding:16px">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
 <button class="save" id="open-chatgpt-btn" style="width:100%;background:#10a37f;margin:0;padding:14px">📋 Copy Prompt</button>
 <button class="save" id="launch-app" style="width:100%;background:#FF6B6B;margin:0;padding:14px">📱 Open App</button>
@@ -90,8 +83,8 @@ input,select,textarea{width:100%;padding:14px;border:1px solid var(--line);borde
 <button class="save" id="tracker-clear" style="width:100%;margin-top:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)">🗑️ Clear All</button>
 </div>
 
-<!-- Analytics Tab -->
-<div id="tab-analytics-section" style="display:none">
+<!-- Tracker Section - Analytics -->
+<div id="section-tracker" style="display:none;padding:16px">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
 <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;text-align:center">
 <div style="color:var(--mute);font-size:13px">Total Customers</div>
@@ -453,6 +446,35 @@ Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM`;
       window.open("https://chat.openai.com","_blank");
     }).catch(()=>{alert("Error copying")});
   }
+  else if(t.id==="btn-add-data"){
+    $("mode-contacts").style.background="var(--card)";
+    $("mode-contacts").style.color="var(--ink)";
+    $("mode-contacts").style.borderColor="var(--line)";
+    $("mode-tracker").style.background="var(--card)";
+    $("mode-tracker").style.color="var(--ink)";
+    $("mode-tracker").style.borderColor="var(--line)";
+    $("btn-add-data").style.background="var(--red)";
+    $("btn-add-data").style.color="#fff";
+    $("btn-add-data").style.borderColor="var(--red)";
+    $("section-contacts").style.display="none";
+    $("section-input").style.display="block";
+    $("section-tracker").style.display="none";
+  }
+  else if(t.id==="mode-tracker"){
+    $("mode-tracker").style.background="var(--red)";
+    $("mode-tracker").style.color="#fff";
+    $("mode-tracker").style.borderColor="var(--red)";
+    $("mode-contacts").style.background="var(--card)";
+    $("mode-contacts").style.color="var(--ink)";
+    $("mode-contacts").style.borderColor="var(--line)";
+    $("btn-add-data").style.background="var(--card)";
+    $("btn-add-data").style.color="var(--ink)";
+    $("btn-add-data").style.borderColor="var(--line)";
+    $("section-contacts").style.display="none";
+    $("section-input").style.display="none";
+    $("section-tracker").style.display="block";
+    renderTracker();
+  }
   else if(t.id==="tab-input"){
     $("tab-input").style.background="var(--red)";
     $("tab-input").style.color="#fff";
@@ -473,27 +495,6 @@ Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM`;
     $("tab-input-section").style.display="none";
     $("tab-analytics-section").style.display="block";
     renderTracker();
-  }
-  else if(t.id==="btn-add-data"){
-    $("mode-contacts").style.background="var(--card)";
-    $("mode-contacts").style.color="var(--ink)";
-    $("mode-contacts").style.borderColor="var(--line)";
-    $("mode-tracker").style.background="var(--card)";
-    $("mode-tracker").style.color="var(--ink)";
-    $("mode-tracker").style.borderColor="var(--line)";
-    $("btn-add-data").style.background="var(--red)";
-    $("btn-add-data").style.color="#fff";
-    $("btn-add-data").style.borderColor="var(--red)";
-    $("section-contacts").style.display="none";
-    $("section-tracker").style.display="block";
-    $("tab-input-section").style.display="block";
-    $("tab-analytics-section").style.display="none";
-    $("tab-input").style.background="var(--red)";
-    $("tab-input").style.color="#fff";
-    $("tab-input").style.border="none";
-    $("tab-analytics").style.background="var(--card)";
-    $("tab-analytics").style.color="var(--ink)";
-    $("tab-analytics").style.border="1px solid var(--line)";
   }
   else if(t.id==="mode-contacts"){
     $("mode-contacts").style.background="#C8102E";
