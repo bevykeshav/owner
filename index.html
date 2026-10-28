@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>क्रेव संपर्क</title>
+<title>Crave Tracker</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#C8102E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="क्रेव संपर्क">
+<meta name="apple-mobile-web-app-title" content="Crave Tracker">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -57,15 +57,15 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);borde
 </style>
 </head>
 <body>
-<header><h1>Crave Kitchen संपर्क</h1><div class="sub" id="cnt"></div></header>
+<header><h1>Crave Tracker</h1><div class="sub" id="cnt"></div></header>
 <div style="display:flex;gap:4px;padding:10px 16px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none">
-<button class="chip" id="mode-contacts" style="flex:none;border-radius:20px;padding:8px 14px;border:1px solid var(--line);background:var(--red);color:#fff;border-color:var(--red)">👥 संपर्क</button>
-<button class="chip" id="mode-tracker" style="flex:none;border-radius:20px;padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink)">📊 ट्रैकर</button>
+<button class="chip" id="mode-contacts" style="flex:none;border-radius:20px;padding:8px 14px;border:1px solid var(--line);background:var(--red);color:#fff;border-color:var(--red)">👥 Contacts</button>
+<button class="chip" id="mode-tracker" style="flex:none;border-radius:20px;padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink)">📊 Tracker</button>
 </div>
 
 <!-- Contacts Section -->
 <div id="section-contacts" style="display:block">
-<input class="search" id="q" type="search" placeholder="नाम या नंबर खोजें">
+<input class="search" id="q" type="search" placeholder="Search name or number">
 <div class="chips" id="chips"></div>
 <div class="list" id="list"></div>
 </div>
@@ -74,7 +74,7 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);borde
 <div id="section-tracker" style="display:none;padding:16px">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
 <button class="save" id="show-prompt" style="background:#1B6EF3;margin:0">📋 ChatGPT Prompt</button>
-<button class="save" id="hide-prompt" style="background:#666;margin:0;display:none">छिपाएँ</button>
+<button class="save" id="hide-prompt" style="background:#666;margin:0;display:none">Hide</button>
 </div>
 
 <div id="prompt-box" style="display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px">
@@ -90,33 +90,33 @@ Rules:
 - If any field is missing, write "unknown"
 
 Example output:
-Name: राज | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
-Name: प्रिया | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM</textarea>
-<button class="save" id="copy-prompt" style="width:100%;margin-top:8px">📋 कॉपी करें</button>
+Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
+Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM</textarea>
+<button class="save" id="copy-prompt" style="width:100%;margin-top:8px">📋 Copy</button>
 </div>
 
-<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--mute)">पेस्ट करें: Name: राज | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM</div>
-<textarea id="tracker-input" rows="5" placeholder="Name: राज | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM&#10;Name: प्रिया | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;resize:vertical"></textarea>
-<button class="save" id="tracker-add" style="width:100%;margin-top:10px">➕ डेटा जोड़ें</button>
-<button class="save" id="tracker-clear" style="width:100%;margin-top:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)">🗑️ सब हटाएँ</button>
+<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--mute)">Paste format: Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM</div>
+<textarea id="tracker-input" rows="5" placeholder="Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM&#10;Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;resize:vertical"></textarea>
+<button class="save" id="tracker-add" style="width:100%;margin-top:10px">➕ Add Data</button>
+<button class="save" id="tracker-clear" style="width:100%;margin-top:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)">🗑️ Clear All</button>
 
 <div style="margin-top:20px">
-<h3 style="margin:0 0 10px;font-size:16px">📈 विश्लेषण</h3>
+<h3 style="margin:0 0 10px;font-size:16px">📈 Analytics</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
 <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px">
-<div style="color:var(--mute);font-size:12px">कुल ग्राहक</div>
+<div style="color:var(--mute);font-size:12px">Total Customers</div>
 <div style="font-size:22px;font-weight:700;color:var(--red);margin-top:4px" id="t-customers">0</div>
 </div>
 <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px">
-<div style="color:var(--mute);font-size:12px">कुल आय</div>
+<div style="color:var(--mute);font-size:12px">Total Revenue</div>
 <div style="font-size:22px;font-weight:700;color:var(--red);margin-top:4px" id="t-total">₹0</div>
 </div>
 </div>
 
-<h4 style="margin:12px 0 8px;font-size:14px">🏆 सबसे जयादा खर्च करने वाले</h4>
+<h4 style="margin:12px 0 8px;font-size:14px">🏆 Top Spenders</h4>
 <div id="t-spenders"></div>
 
-<h4 style="margin:12px 0 8px;font-size:14px">🔄 सबसे ज्यादा आने वाले</h4>
+<h4 style="margin:12px 0 8px;font-size:14px">🔄 Most Frequent</h4>
 <div id="t-frequent"></div>
 </div>
 </div>
@@ -219,10 +219,10 @@ function parseTrackerInput(text){
       const [k,v]=p.split(':');
       const key=k.trim().toLowerCase();
       const val=v.trim();
-      if(key.includes('name')||key.includes('नाम'))parts.name=val;
-      else if(key.includes('amount')||key.includes('रकम'))parts.amount=parseFloat(val)||0;
-      else if(key.includes('date')||key.includes('तारीख'))parts.date=val;
-      else if(key.includes('time')||key.includes('समय'))parts.time=val;
+      if(key.includes('name'))parts.name=val;
+      else if(key.includes('amount'))parts.amount=parseFloat(val)||0;
+      else if(key.includes('date'))parts.date=val;
+      else if(key.includes('time'))parts.time=val;
     });
     if(parts.name&&parts.amount)trans.push({...parts,id:Date.now()+Math.random()});
   });
@@ -247,21 +247,21 @@ function renderTracker(){
       <div style="font-weight:500">${name}</div>
       <div style="display:flex;gap:12px;margin-top:6px;font-size:12px;color:var(--mute)">
         <span>💰 ₹${data.total}</span>
-        <span>📊 ${data.count} बार</span>
+        <span>📊 ${data.count} times</span>
       </div>
     </div>`
-  ).join("")||"<div style='color:var(--mute);padding:10px'>कोई डेटा नहीं</div>";
+  ).join("")||"<div style='color:var(--mute);padding:10px'>No data</div>";
 
   const frequent=Object.entries(byName).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
   $("t-frequent").innerHTML=frequent.map(([name,data])=>
     `<div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="showTrackerDetail('${name}')">
       <div style="font-weight:500">${name}</div>
       <div style="display:flex;gap:12px;margin-top:6px;font-size:12px;color:var(--mute)">
-        <span>🔄 ${data.count} बार</span>
+        <span>🔄 ${data.count} times</span>
         <span>💰 ₹${data.total}</span>
       </div>
     </div>`
-  ).join("")||"<div style='color:var(--mute);padding:10px'>कोई डेटा नहीं</div>";
+  ).join("")||"<div style='color:var(--mute);padding:10px'>No data</div>";
 }
 function showTrackerDetail(name){
   const cusTrans=trackerData.filter(t=>t.name===name).sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -269,11 +269,11 @@ function showTrackerDetail(name){
 
   open(`<p class="big">${esc(name)}</p>
   <div style="margin-top:12px;padding:12px;background:var(--line);border-radius:10px">
-    <div class="ph">कुल खर्च</div>
+    <div class="ph">Total Spent</div>
     <div style="font-size:20px;font-weight:700;color:var(--red)">₹${total}</div>
   </div>
   <div style="margin-top:12px">
-    <label style="display:block;margin:0 0 8px 0">ट्रांजैक्शन हिस्ट्री</label>
+    <label style="display:block;margin:0 0 8px 0">Transaction History</label>
     <div style="border:1px solid var(--line);border-radius:10px;padding:10px;max-height:300px;overflow-y:auto">
     ${cusTrans.map(t=>`
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);align-items:center">
@@ -286,7 +286,7 @@ function showTrackerDetail(name){
     `).join("")}
     </div>
   </div>
-  <div class="sm" style="margin-top:14px"><button id="cl">बंद करें</button></div>`);
+  <div class="sm" style="margin-top:14px"><button id="cl">Close</button></div>`);
 }
 function parseCustomerData(text){
   const lines=text.split('\n');
@@ -415,8 +415,8 @@ document.addEventListener("click",e=>{
   else if(t.id==="copy-prompt"){
     const prompt=$("prompt-text").value;
     navigator.clipboard.writeText(prompt).then(()=>{
-      alert("प्रॉम्प्ट कॉपी हो गया! ChatGPT में पेस्ट करो");
-    }).catch(()=>{alert("कॉपी करने में दिक्कत हुई")});
+      alert("Prompt copied! Paste in ChatGPT");
+    }).catch(()=>{alert("Error copying")});
   }
   else if(t.id==="mode-contacts"){
     $("mode-contacts").style.background="#C8102E";
@@ -441,20 +441,20 @@ document.addEventListener("click",e=>{
   }
   else if(t.id==="tracker-add"){
     const text=$("tracker-input").value;
-    if(!text.trim()){alert("कुछ डेटा पेस्ट करें");return}
+    if(!text.trim()){alert("Please paste some data");return}
     const newTrans=parseTrackerInput(text);
-    if(!newTrans.length){alert("सही फॉर्मेट में डेटा डालें");return}
+    if(!newTrans.length){alert("Please use correct format");return}
     trackerData.push(...newTrans);
     cacheTracker();
     $("tracker-input").value="";
-    alert(`${newTrans.length} ट्रांजैक्शन जोड़े गए!`);
+    alert(`${newTrans.length} transactions added!`);
     renderTracker();
   }
   else if(t.id==="tracker-clear"){
-    if(confirm("सब डेटा हटा दूँ?")){
+    if(confirm("Delete all data?")){
       trackerData=[];
       cacheTracker();
-      alert("सब डेटा हटा दिया गया");
+      alert("All data deleted");
       renderTracker();
     }
   }
