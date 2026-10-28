@@ -93,6 +93,7 @@ Example output:
 Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
 Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM</textarea>
 <button class="save" id="copy-prompt" style="width:100%;margin-top:8px">📋 Copy</button>
+<button class="save" id="open-chatgpt" style="width:100%;margin-top:8px;background:#10a37f">🤖 Open ChatGPT</button>
 </div>
 
 <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--mute)">Paste format: Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM</div>
@@ -416,6 +417,12 @@ document.addEventListener("click",e=>{
     const prompt=$("prompt-text").value;
     navigator.clipboard.writeText(prompt).then(()=>{
       alert("Prompt copied! Paste in ChatGPT");
+    }).catch(()=>{alert("Error copying")});
+  }
+  else if(t.id==="open-chatgpt"){
+    const prompt=$("prompt-text").value;
+    navigator.clipboard.writeText(prompt).then(()=>{
+      window.open("https://chat.openai.com","_blank");
     }).catch(()=>{alert("Error copying")});
   }
   else if(t.id==="mode-contacts"){
