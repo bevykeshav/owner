@@ -197,16 +197,23 @@ function parseTrackerInput(text){
   const trans=[];
   lines.forEach(line=>{
     const parts={};
-    line.split('|').forEach(p=>{
-      const [k,v]=p.split(':');
-      const key=k.trim().toLowerCase();
-      const val=v.trim();
+    const pairs=line.split('|');
+    pairs.forEach(p=>{
+      const colonIdx=p.indexOf(':');
+      if(colonIdx<0)return;
+      const key=p.substring(0,colonIdx).trim().toLowerCase();
+      const val=p.substring(colonIdx+1).trim();
       if(key.includes('name'))parts.name=val;
-      else if(key.includes('amount'))parts.amount=parseFloat(val)||0;
+      else if(key.includes('amount')){
+        const amt=parseFloat(val.replace(/[^0-9.]/g,''))||0;
+        parts.amount=amt;
+      }
       else if(key.includes('date'))parts.date=val;
       else if(key.includes('time'))parts.time=val;
     });
-    if(parts.name&&parts.amount)trans.push({...parts,id:Date.now()+Math.random()});
+    if(parts.name&&parts.amount>0){
+      trans.push({...parts,id:Date.now()+Math.random()});
+    }
   });
   return trans;
 }
