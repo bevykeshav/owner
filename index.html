@@ -19,18 +19,18 @@
 :root[data-theme="dark"]{--bg:#101814;--card:#18231D;--ink:#EAF1EC;--mute:#93A399;--line:#26352C;--red:#F0475F}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind',system-ui,sans-serif;font-size:16px;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
-header{padding:18px 16px 8px}
-h1{margin:0;font-size:22px;font-weight:700}
-.sub{color:var(--mute);font-size:14px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind',system-ui,sans-serif;font-size:16px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+header{padding:16px 16px 12px}
+h1{margin:0;font-size:24px;font-weight:700}
+.sub{color:var(--mute);font-size:14px;margin-top:6px}
 .search{margin:10px 16px;display:block;width:calc(100% - 32px);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 10px;scrollbar-width:none}
 .chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;border-radius:20px;font:inherit;font-size:14px}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .list{margin:0 16px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;font:inherit;text-align:left}
+.row{display:flex;align-items:center;gap:14px;padding:14px 14px;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;color:inherit;font:inherit;text-align:left;min-height:60px}
 .row:last-child{border-bottom:0}
-.av{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff}
+.av{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;font-size:18px}
 .nm{font-weight:500}.ph{color:var(--mute);font-size:14px}
 .tag{margin-left:auto;font-size:12px;color:var(--mute);border:1px solid var(--line);padding:2px 8px;border-radius:10px}
 .empty{padding:36px 20px;text-align:center;color:var(--mute)}
@@ -47,11 +47,11 @@ h1{margin:0;font-size:22px;font-weight:700}
 .sm{display:flex;gap:10px}
 .sm button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit}
 .sm .del{color:var(--red)}
-label{display:block;margin:12px 0 4px;font-size:14px;color:var(--mute)}
-input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
-.save{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;background:var(--red);color:#fff;font:inherit;font-weight:700}
-.foot{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 16px 0}
-.foot button{background:none;border:1px solid var(--line);color:var(--mute);padding:8px 14px;border-radius:10px;font:inherit;font-size:14px}
+label{display:block;margin:14px 0 6px;font-size:15px;color:var(--mute);font-weight:500}
+input,select,textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px;line-height:1.5}
+.save{width:100%;margin-top:16px;padding:16px;border:0;border-radius:12px;background:var(--red);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.foot{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 16px 0;padding-bottom:10px}
+.foot button{background:none;border:1px solid var(--line);color:var(--mute);padding:12px 16px;border-radius:10px;font:inherit;font-size:15px;font-weight:500}
 .cr{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}.dot{width:12px;height:12px;border-radius:50%;flex:none}.cn{flex:1}.cr button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit;font-size:14px}.cr .del{color:var(--red)}
 :focus-visible{outline:2px solid var(--red);outline-offset:2px}
 </style>
@@ -72,29 +72,7 @@ input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);borde
 
 <!-- Tracker Section -->
 <div id="section-tracker" style="display:none;padding:16px">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-<button class="save" id="show-prompt" style="background:#1B6EF3;margin:0">📋 ChatGPT Prompt</button>
-<button class="save" id="hide-prompt" style="background:#666;margin:0;display:none">Hide</button>
-</div>
-
-<div id="prompt-box" style="display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px">
-<textarea readonly style="width:100%;height:150px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical;font-size:12px;font-family:monospace;padding:10px" id="prompt-text">Extract customer transaction details from this image and return ONLY in this exact format (one line per transaction):
-
-Name: [customer name] | Amount: [amount in numbers only] | Date: [YYYY-MM-DD format] | Time: [HH:MM AM/PM format]
-
-Rules:
-- Extract only the name (no titles like Mr, Mrs, Shri)
-- Amount should be numbers only
-- Date should be YYYY-MM-DD (example: 2026-10-28)
-- Time should be in HH:MM AM/PM format (example: 2:30 PM)
-- If any field is missing, write "unknown"
-
-Example output:
-Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
-Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM</textarea>
-<button class="save" id="copy-prompt" style="width:100%;margin-top:8px">📋 Copy</button>
-<button class="save" id="open-chatgpt" style="width:100%;margin-top:8px;background:#10a37f">🤖 Open ChatGPT</button>
-</div>
+<button class="save" id="open-chatgpt-btn" style="width:100%;background:#10a37f;margin-bottom:16px">🤖 Open ChatGPT & Copy Prompt</button>
 
 <div style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--mute)">Paste format: Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM</div>
 <textarea id="tracker-input" rows="5" placeholder="Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM&#10;Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;resize:vertical"></textarea>
@@ -403,20 +381,23 @@ async function runImport(){
 
 document.addEventListener("click",e=>{
   const t=e.target.closest("button");if(!t)return;
-  if(t.id==="show-prompt"){
-    $("prompt-box").style.display="block";
-    $("show-prompt").style.display="none";
-    $("hide-prompt").style.display="block";
-  }
-  else if(t.id==="hide-prompt"){
-    $("prompt-box").style.display="none";
-    $("show-prompt").style.display="block";
-    $("hide-prompt").style.display="none";
-  }
-  else if(t.id==="copy-prompt"){
-    const prompt=$("prompt-text").value;
+  if(t.id==="open-chatgpt-btn"){
+    const prompt=`Extract customer transaction details from this image and return ONLY in this exact format (one line per transaction):
+
+Name: [customer name] | Amount: [amount in numbers only] | Date: [YYYY-MM-DD format] | Time: [HH:MM AM/PM format]
+
+Rules:
+- Extract only the name (no titles like Mr, Mrs, Shri)
+- Amount should be numbers only
+- Date should be YYYY-MM-DD (example: 2026-10-28)
+- Time should be in HH:MM AM/PM format (example: 2:30 PM)
+- If any field is missing, write "unknown"
+
+Example output:
+Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
+Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM`;
     navigator.clipboard.writeText(prompt).then(()=>{
-      alert("Prompt copied! Paste in ChatGPT");
+      window.open("https://chat.openai.com","_blank");
     }).catch(()=>{alert("Error copying")});
   }
   else if(t.id==="open-chatgpt"){
