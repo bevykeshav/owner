@@ -72,9 +72,10 @@ input,select,textarea{width:100%;padding:14px;border:1px solid var(--line);borde
 
 <!-- Tracker Section -->
 <div id="section-tracker" style="display:none;padding:16px">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;border-bottom:2px solid var(--line);padding-bottom:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;border-bottom:2px solid var(--line);padding-bottom:12px">
 <button class="chip" id="tab-input" style="flex:none;width:100%;border-radius:10px;padding:12px;border:none;background:var(--red);color:#fff;font-weight:700;cursor:pointer;font-size:15px">📝 Add Data</button>
 <button class="chip" id="tab-analytics" style="flex:none;width:100%;border-radius:10px;padding:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;cursor:pointer;font-size:15px">📈 Analytics</button>
+<button class="save" id="tracker-add" style="width:100%;margin:0;padding:12px;font-size:15px">➕ Add</button>
 </div>
 
 <!-- Add Data Tab -->
@@ -85,7 +86,6 @@ input,select,textarea{width:100%;padding:14px;border:1px solid var(--line);borde
 </div>
 
 <textarea id="tracker-input" rows="3" placeholder="Paste from ChatGPT here..." style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;resize:vertical"></textarea>
-<button class="save" id="tracker-add" style="width:100%;margin-top:10px">➕ Add Data</button>
 <button class="save" id="tracker-clear" style="width:100%;margin-top:8px;background:var(--card);color:var(--ink);border:1px solid var(--line)">🗑️ Clear All</button>
 </div>
 
