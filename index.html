@@ -193,11 +193,12 @@ function addPaymentForm(id){
   <div class="sm" style="margin-top:10px"><button id="cl">रद्द करें</button></div>`);
 }
 function parseTrackerInput(text){
-  const lines=text.split('\n').filter(x=>x.trim());
   const trans=[];
-  lines.forEach(line=>{
+  const entries=text.split(/(?=Name:)/i).filter(x=>x.trim());
+
+  entries.forEach(entry=>{
     const parts={};
-    const pairs=line.split('|');
+    const pairs=entry.split('|');
     pairs.forEach(p=>{
       const colonIdx=p.indexOf(':');
       if(colonIdx<0)return;
