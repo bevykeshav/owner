@@ -397,7 +397,7 @@ Example output:
 Name: Raj | Amount: 500 | Date: 2026-10-28 | Time: 2:30 PM
 Name: Priya | Amount: 300 | Date: 2026-10-28 | Time: 3:15 PM`;
     navigator.clipboard.writeText(prompt).then(()=>{
-      window.open("https://chat.openai.com","_blank");
+      alert("✅ Prompt copied!\n\n1. Open ChatGPT app\n2. Upload image\n3. Paste (Ctrl+V or Cmd+V)");
     }).catch(()=>{alert("Error copying")});
   }
   else if(t.id==="open-chatgpt"){
